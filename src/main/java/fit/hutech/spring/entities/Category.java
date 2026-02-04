@@ -24,8 +24,10 @@ private Long id;
 @Size(min = 1, max = 50, message = "Name must be between 1 and 50 characters")
 @NotBlank(message = "Name must not be blank")
 private String name;
+
 @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
 @ToString.Exclude
+@Builder.Default
 private List<Book> books = new ArrayList<>();
 @Override
 public boolean equals(Object o) {

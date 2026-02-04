@@ -20,13 +20,18 @@ public class Invoice {
 @GeneratedValue(strategy = GenerationType.IDENTITY)
 @Column(name = "id")
 private Long id;
+
 @Column(name = "invoice_date")
+@Builder.Default
 private Date invoiceDate = new Date();
+
 @Column(name = "total")
 @Positive(message = "Total must be positive")
 private Double price;
+
 @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL)
 @ToString.Exclude
+@Builder.Default
 private List<ItemInvoice> itemInvoices = new ArrayList<>();
 
 @ManyToOne(fetch = FetchType.LAZY)

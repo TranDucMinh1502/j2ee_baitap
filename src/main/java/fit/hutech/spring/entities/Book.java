@@ -37,8 +37,10 @@ private Double price;
 @ValidCategoryId
 @ToString.Exclude
 private Category category;
+
 @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
 @ToString.Exclude
+@Builder.Default
 private List<ItemInvoice> itemInvoices = new ArrayList<>();
 @Override
 public boolean equals(Object o) {

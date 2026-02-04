@@ -1,75 +1,288 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign Up - Bookstore</title>
+    <th:block th:replace="~{layout :: link-css}"></th:block>
+    <th:block th:replace="~{layout::custom-css}"></th:block>
+    <style>
+      body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+      }
+      .form-control.is-invalid {
+        border-color: #dc3545;
+      }
+      .invalid-feedback {
+        display: block;
+        font-size: 0.875rem;
+        color: #dc3545;
+        margin-top: 0.25rem;
+      }
+      .password-requirements {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-top: 0.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+          <div class="card shadow-lg" style="border-radius: 12px; border: none;">
+            <div class="card-body p-5">
+              <!-- Header -->
+              <div class="text-center mb-4">
+                <h2 class="fw-bold mb-2" style="color: #333;">Join Us</h2>
+                <p class="text-muted mb-4">Create your Bookstore account</p>
+              </div>
 
-<meta name="viewport" content="width=device-width, initial-
-scale=1.0">
+              <!-- Display error message -->
+              <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>Error!</strong> <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              </div>
 
-<title>Sign Up</title>
-<th:block th:replace="~{layout :: link-css}"></th:block>
-<th:block th:replace="~{layout::custom-css}"></th:block>
-</head>
-<body style="background: #f6f7fc;">
-<th:block th:replace="~{layout :: header}"></th:block>
-<div class="container py-5 h-100">
-<div class="row justify-content-center align-items-center h-100">
-<div class="col-12 col-lg-6 col-md-8 col-xl-5">
-<div class="card shadow" style="border-radius: 1rem;">
-<div class="card-body p-5 text-center">
-<h3>Sign up to <strong>Bookstore</strong></h3>
-<p class="mb-4 text-secondary">Welcome to
-Bookstore, please sign up to continue.</p>
-<form th:action="@{/register}" method="post">
+              <!-- Display validation errors -->
+              <div th:if="${errors}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>Please fix the following errors:</strong>
+                <ul class="mb-0 mt-2">
+                  <li th:each="error : ${errors}" th:text="${error}"></li>
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              </div>
 
-<div th:if="${errors}" class="alert alert-
-danger justify-content-center" role="alert">
-<ul>
-<li th:each="error : ${errors}"
-th:text="${error}" class="text-danger text-start"></li>
-</ul>
-</div>
+              <!-- Registration Form -->
+              <form th:action="@{/register}" th:object="${user}" method="post" novalidate class="needs-validation">
+                
+                <!-- Email Field -->
+                <div class="mb-3">
+                  <label for="email" class="form-label fw-semibold">Email <span class="text-danger">*</span></label>
+                  <input
+                    type="email"
+                    class="form-control form-control-lg"
+                    th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'"
+                    id="email"
+                    th:field="*{email}"
+                    placeholder="your@email.com"
+                    required
+                  />
+                  <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}">
+                    <span th:errors="*{email}"></span>
+                  </div>
+                </div>
 
-<div class="form-group mb-4">
-<label for="email"></label>
-<input type="email" class="form-control"
-required id="email" name="email" placeholder="Enter your email">
-</div>
+                <!-- Username Field -->
+                <div class="mb-3">
+                  <label for="username" class="form-label fw-semibold">Username <span class="text-danger">*</span></label>
+                  <input
+                    type="text"
+                    class="form-control form-control-lg"
+                    th:classappend="${#fields.hasErrors('username')} ? 'is-invalid'"
+                    id="username"
+                    th:field="*{username}"
+                    placeholder="Choose a username"
+                    minlength="1"
+                    maxlength="50"
+                    required
+                  />
+                  <div class="invalid-feedback" th:if="${#fields.hasErrors('username')}">
+                    <span th:errors="*{username}"></span>
+                  </div>
+                  <small class="form-text text-muted">Must be unique, 1-50 characters</small>
+                </div>
 
-<div class="form-group mb-4">
-<label for="username"></label>
-<input type="text" class="form-control"
-required id="username" name="username" placeholder="Enter your
-username">
-</div>
+                <!-- Password Field -->
+                <div class="mb-3">
+                  <label for="password" class="form-label fw-semibold">Password <span class="text-danger">*</span></label>
+                  <input
+                    type="password"
+                    class="form-control form-control-lg"
+                    th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'"
+                    id="password"
+                    th:field="*{password}"
+                    placeholder="Enter a strong password"
+                    minlength="6"
+                    maxlength="250"
+                    required
+                  />
+                  <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}">
+                    <span th:errors="*{password}"></span>
+                  </div>
+                  <small class="form-text text-muted">Minimum 6 characters</small>
+                </div>
 
-<div class="form-group mb-4">
-<label for="password"></label>
-<input type="password" class="form-control"
-required id="password" name="password" placeholder="Enter your
-password">
-</div>
-<div class="form-group mb-4">
-<label for="phone"></label>
-<input type="tel" class="form-control"
-required id="phone" name="phone" placeholder="Enter your phone">
-</div>
-<div class="d-grid gap-2 form-action">
+                <!-- Phone Field (Optional) -->
+                <div class="mb-4">
+                  <label for="phone" class="form-label fw-semibold">Phone (Optional)</label>
+                  <input
+                    type="tel"
+                    class="form-control form-control-lg"
+                    th:classappend="${#fields.hasErrors('phone')} ? 'is-invalid'"
+                    id="phone"
+                    th:field="*{phone}"
+                    placeholder="10-digit phone number"
+                    pattern="[0-9]{10}"
+                    minlength="10"
+                    maxlength="10"
+                  />
+                  <div class="invalid-feedback" th:if="${#fields.hasErrors('phone')}">
+                    <span th:errors="*{phone}"></span>
+                  </div>
+                  <small class="form-text text-muted">10 digits only, e.g., 0123456789</small>
+                </div>
 
-<button type="submit" class="btn btn-
-primary btn-lg btn-block">Sign up</button>
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary btn-lg w-100 fw-semibold mb-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+                  Create Account
+                </button>
+              </form>
 
-<p class="mt-3 mb-0">Already have an
-account? <a class="text-info text-center" th:href="${'/login'}">Login
-in?</a></p>
-</div>
-</form>
-</div>
-</div>
-</div>
-</div>
-</div>
-<th:block th:replace="~{layout :: footer}"></th:block>
-</body>
+              <hr class="my-4" />
+
+              <!-- Login Link -->
+              <div class="text-center">
+                <p class="mb-0 text-muted">Already have an account?
+                  <a th:href="@{/login}" class="fw-bold text-decoration-none" style="color: #667eea;">
+                    Sign In
+                  </a>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+                <!-- Email Field -->
+                <div class="mb-4">
+                  <label for="email" class="form-label"
+                    >Email <span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="email"
+                    class="form-control"
+                    th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'"
+                    id="email"
+                    th:field="*{email}"
+                    placeholder="your@email.com"
+                    required
+                    pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$"
+                  />
+                  <div
+                    class="invalid-feedback"
+                    th:if="${#fields.hasErrors('email')}"
+                  >
+                    <span th:errors="*{email}"></span>
+                  </div>
+                </div>
+
+                <!-- Username Field -->
+                <div class="mb-4">
+                  <label for="username" class="form-label"
+                    >Username <span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    th:classappend="${#fields.hasErrors('username')} ? 'is-invalid'"
+                    id="username"
+                    th:field="*{username}"
+                    placeholder="Username (3-50 characters)"
+                    minlength="1"
+                    maxlength="50"
+                    required
+                  />
+                  <div
+                    class="invalid-feedback"
+                    th:if="${#fields.hasErrors('username')}"
+                  >
+                    <span th:errors="*{username}"></span>
+                  </div>
+                  <small class="form-text text-muted"
+                    >Username must be unique</small
+                  >
+                </div>
+
+                <!-- Password Field -->
+                <div class="mb-4">
+                  <label for="password" class="form-label"
+                    >Password <span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="password"
+                    class="form-control"
+                    th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'"
+                    id="password"
+                    th:field="*{password}"
+                    placeholder="Enter your password"
+                    minlength="6"
+                    maxlength="250"
+                    required
+                  />
+                  <div
+                    class="invalid-feedback"
+                    th:if="${#fields.hasErrors('password')}"
+                  >
+                    <span th:errors="*{password}"></span>
+                  </div>
+                  <div class="password-requirements">
+                    <i class="bi bi-info-circle"></i> Password must be at least
+                    6 characters
+                  </div>
+                </div>
+
+                <!-- Phone Field (Optional) -->
+                <div class="mb-4">
+                  <label for="phone" class="form-label">Phone (Optional)</label>
+                  <input
+                    type="tel"
+                    class="form-control"
+                    th:classappend="${#fields.hasErrors('phone')} ? 'is-invalid'"
+                    id="phone"
+                    th:field="*{phone}"
+                    placeholder="10-digit phone number"
+                    pattern="[0-9]{10}"
+                    minlength="10"
+                    maxlength="10"
+                  />
+                  <div
+                    class="invalid-feedback"
+                    th:if="${#fields.hasErrors('phone')}"
+                  >
+                    <span th:errors="*{phone}"></span>
+                  </div>
+                  <small class="form-text text-muted"
+                    >Enter 10 digits only (e.g., 0123456789)</small
+                  >
+                </div>
+
+                <!-- Submit Button -->
+                <div class="d-grid gap-2 mb-4">
+                  <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="bi bi-person-plus"></i> Sign up
+                  </button>
+                </div>
+
+                <!-- Login Link -->
+                <div class="text-center">
+                  <p class="mb-0">
+                    Already have an account?
+                    <a th:href="@{/login}" class="text-info">Login here</a>
+                  </p>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <th:block th:replace="~{layout :: footer}"></th:block>
+  </body>
 </html>

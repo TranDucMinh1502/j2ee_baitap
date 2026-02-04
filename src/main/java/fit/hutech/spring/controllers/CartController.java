@@ -32,11 +32,17 @@ return "redirect:/cart";
 }
 @GetMapping("/updateCart/{id}/{quantity}")
 public String updateCart(HttpSession session,
-@PathVariable Long id,
-@PathVariable int quantity) {
-var cart = cartService.getCart(session);
-cart.updateItems(id, quantity);
-return "book/cart";
+                         @PathVariable Long id,
+                         @PathVariable int quantity) {
+    if (quantity <= 0) {
+        var cart = cartService.getCart(session);
+        cart.removeItems(id);
+    } else {
+        var cart = cartService.getCart(session);
+        cart.updateItems(id, quantity);
+        cartService.updateCart(session, cart);
+    }
+    return "redirect:/cart";
 }
 @GetMapping("/checkout")
 public String checkout(HttpSession session) {
@@ -45,7 +51,7 @@ return "redirect:/cart";
 }
 @GetMapping("/clearCart")
 public String clearCart(HttpSession session) {
-cartService.removeCart(session);
-return "redirect:/cart ";
+    cartService.removeCart(session);
+    return "redirect:/cart";
 }
 }

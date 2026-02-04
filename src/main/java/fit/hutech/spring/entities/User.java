@@ -11,6 +11,7 @@ import org.hibernate.validator.constraints.Length;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -40,17 +41,24 @@ private String password;
 @Size(min = 1, max = 50, message = "Email must be between 1 and 50 characters")
 @Email
 private String email;
-@Column(name = "phone", length = 10, unique = true)
+
+@Column(name = "provider", length = 50)
+private String provider;
+
+@Column(name = "phone", length = 10, unique = true, nullable = true)
 @Length(min = 10, max = 10, message = "Phone must be 10 characters")
 @Pattern(regexp = "^[0-9]*$", message = "Phone must be number")
 private String phone;
-@ManyToMany(fetch=FetchType.EAGER)
+@ManyToMany(fetch = FetchType.EAGER)
 @JoinTable(name = "user_role",
-joinColumns = @JoinColumn(name = "user_id"),
-inverseJoinColumns = @JoinColumn(name = "role_id"))
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "role_id"))
+@Builder.Default
 private Set<Role> roles = new HashSet<>();
+
 @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
 @ToString.Exclude
+@Builder.Default
 private Set<Invoice> invoices = new HashSet<>();
 
 @Override
@@ -86,15 +94,14 @@ return true;
 }
 @Override
 public boolean equals(Object o) {
-if (this == o) return true;
-if (o == null || Hibernate.getClass(this) !=
-Hibernate.getClass(o)) return false;
-User user = (User) o;
-return getId() != null && Objects.equals(getId(),
-user.getId());
+    if (this == o) return true;
+    if (o == null || Hibernate.getClass(this) !=
+            Hibernate.getClass(o)) return false;
+    User user = (User) o;
+    return getId() != null && Objects.equals(getId(),
+            user.getId());
 }
-@Column(name = "provider", length = 50)
-private String provider;
+
 @Override
 public int hashCode() {
     return getClass().hashCode();
