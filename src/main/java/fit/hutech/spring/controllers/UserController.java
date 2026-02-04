@@ -4,16 +4,15 @@ import fit.hutech.spring.services.UserService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import
-org.springframework.context.support.DefaultMessageSourceResolvable;
-import
-org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/")
 @RequiredArgsConstructor
@@ -41,6 +40,7 @@ model.addAttribute("errors", errors);
 return "user/register";
 }
 userService.save(user);
+userService.setDefaultRole(user.getUsername());
 return "redirect:/login";
 }
 }

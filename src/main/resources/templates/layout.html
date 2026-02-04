@@ -36,19 +36,26 @@ id="navbarSupportedContent">
 <a class="nav-link active" aria-current="page"
 href="/">Home</a>
 </li>
-<li class="nav-item">
+<li class="nav-item" sec:authorize="hasAnyAuthority('ADMIN',
+'USER')">
 <a class="nav-link" href="/books">
 List Book
 </a>
-</li>
-<li class="nav-item">
+</li><li class="nav-item"
+sec:authorize="hasAnyAuthority('ADMIN')">
 <a class="nav-link" href="/books/add">
 Add Book
 </a>
 </li>
+<li class="nav-item" sec:authorize="hasAnyAuthority('ADMIN',
+'USER')">
+<a class="nav-link" href="/cart">
+Cart
+</a>
+</li>
 <li sec:authorize="isAuthenticated()">
 <form th:action="@{/logout}" method="post">
-    <button class="btn btn-outline-danger"
+<button class="btn btn-outline-danger"
 type="submit">Logout</button>
 </form>
 </li>

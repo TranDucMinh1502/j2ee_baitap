@@ -9,6 +9,7 @@ import lombok.*;
 import org.hibernate.Hibernate;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.HashSet;
@@ -43,13 +44,21 @@ private String email;
 @Length(min = 10, max = 10, message = "Phone must be 10 characters")
 @Pattern(regexp = "^[0-9]*$", message = "Phone must be number")
 private String phone;
+@ManyToMany(fetch=FetchType.EAGER)
+@JoinTable(name = "user_role",
+joinColumns = @JoinColumn(name = "user_id"),
+inverseJoinColumns = @JoinColumn(name = "role_id"))
+private Set<Role> roles = new HashSet<>();
 @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
 @ToString.Exclude
 private Set<Invoice> invoices = new HashSet<>();
 
 @Override
 public Collection<? extends GrantedAuthority> getAuthorities() {
-return Collections.emptyList();
+Set<Role> userRoles = this.getRoles();
+return userRoles.stream()
+.map(role -> new SimpleGrantedAuthority(role.getName()))
+.toList();
 }
 @Override
 public String getPassword() {
