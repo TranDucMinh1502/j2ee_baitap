@@ -163,6 +163,7 @@ public class AppConfig {
                 admin.setUsername("admin");
                 admin.setPassword(passwordEncoder.encode("admin123"));
                 admin.setEmail("admin@hutech.edu.vn");
+                admin.setName("Quản trị viên");
                 admin.setFullName("Quản trị viên");
                 admin.setPhone("0123456789");
                 admin.setEnabled(true);
@@ -176,6 +177,7 @@ public class AppConfig {
                 normalUser.setUsername("user");
                 normalUser.setPassword(passwordEncoder.encode("user123"));
                 normalUser.setEmail("user@hutech.edu.vn");
+                normalUser.setName("Người dùng");
                 normalUser.setFullName("Người dùng");
                 normalUser.setPhone("0987654321");
                 normalUser.setEnabled(true);

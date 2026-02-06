@@ -46,6 +46,9 @@ public class User implements UserDetails {
     @Column(name = "phone", length = 15)
     private String phone;
     
+    @Column(name = "name", length = 100)
+    private String name;
+    
     @Column(name = "full_name", length = 100)
     private String fullName;
     
@@ -111,6 +114,14 @@ public class User implements UserDetails {
     protected void onCreate() {
         createdAt = java.time.LocalDateTime.now();
         updatedAt = java.time.LocalDateTime.now();
+        // Auto-set name from fullName if name is null
+        if (name == null && fullName != null) {
+            name = fullName;
+        }
+        // Auto-set fullName from name if fullName is null
+        if (fullName == null && name != null) {
+            fullName = name;
+        }
     }
     
     @PreUpdate

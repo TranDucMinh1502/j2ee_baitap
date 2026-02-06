@@ -51,7 +51,7 @@ public class ChatController {
             chatService.markAsReadForCustomer(conversation.get().getId());
         }
         
-        return "chat";
+        return "book/chat";
     }
     
     /**

@@ -74,7 +74,7 @@ public class CartController {
         model.addAttribute("cart", cart);
         model.addAttribute("totalItems", cart.getTotalItems());
         model.addAttribute("totalPrice", cart.getTotalPrice());
-        return "cart";
+        return "book/cart";
     }
     
     @PostMapping("/add/{id}")
@@ -174,7 +174,7 @@ public class CartController {
             model.addAttribute("voucherCode", "");
         }
         
-        return "checkout";
+        return "book/checkout";
     }
     
     /**

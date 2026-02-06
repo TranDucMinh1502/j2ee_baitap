@@ -25,7 +25,7 @@ public class BookController {
     public String showAllBooks(Model model) {
         model.addAttribute("books", bookService.getAllBooks());
         model.addAttribute("totalBooks", bookService.countBooks());
-        return "list";
+        return "book/list";
     }
 
     @GetMapping("/add")
@@ -33,7 +33,7 @@ public class BookController {
         model.addAttribute("book", new Book());
         model.addAttribute("categories", categoryService.getAllCategories());
         model.addAttribute("isEdit", false);
-        return "form";
+        return "book/form";
     }
 
     @PostMapping("/add")
@@ -43,7 +43,7 @@ public class BookController {
                          RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
             model.addAttribute("categories", categoryService.getAllCategories());
-            return "form";
+            return "book/form";
         }
         
         bookService.saveBook(book);
@@ -64,7 +64,7 @@ public class BookController {
         model.addAttribute("book", book);
         model.addAttribute("categories", categoryService.getAllCategories());
         model.addAttribute("isEdit", true);
-        return "form";
+        return "book/form";
     }
 
     @PostMapping("/edit/{id}")
@@ -76,7 +76,7 @@ public class BookController {
         if (result.hasErrors()) {
             model.addAttribute("categories", categoryService.getAllCategories());
             model.addAttribute("isEdit", true);
-            return "form";
+            return "book/form";
         }
         
         try {
@@ -100,7 +100,7 @@ public class BookController {
         }
         
         model.addAttribute("book", book);
-        return "detail";
+        return "book/detail";
     }
 
     @GetMapping("/delete/{id}")

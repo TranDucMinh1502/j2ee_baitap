@@ -30,7 +30,7 @@ public class UserController {
             return "redirect:/login";
         }
         model.addAttribute("user", user);
-        return "profile";
+        return "book/profile";
     }
     
     @GetMapping("/orders")
@@ -47,7 +47,7 @@ public class UserController {
         
         model.addAttribute("user", user);
         model.addAttribute("orders", orders);
-        return "my-orders";
+        return "book/my-orders";
     }
     
     @GetMapping("/orders/{id}")
@@ -72,7 +72,7 @@ public class UserController {
             model.addAttribute("user", user);
             model.addAttribute("order", order);
             model.addAttribute("orderItems", cartService.getInvoiceItems(id));
-            return "order-detail";
+            return "book/order-detail";
             
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Không tìm thấy đơn hàng!");

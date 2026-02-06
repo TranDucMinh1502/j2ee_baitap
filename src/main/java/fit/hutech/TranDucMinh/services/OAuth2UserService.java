@@ -45,6 +45,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
             User newUser = new User();
             newUser.setUsername(email);
             newUser.setEmail(email);
+            newUser.setName(name);
             newUser.setFullName(name);
             newUser.setPassword(new BCryptPasswordEncoder().encode(UUID.randomUUID().toString())); // OAuth2 users không cần password nhưng cột không được rỗng
             newUser.setEnabled(true);

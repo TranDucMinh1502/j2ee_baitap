@@ -26,11 +26,21 @@ public class UserService implements UserDetailsService {
             .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy user: " + username));
     }
     
+    @Transactional
     public User save(User user) {
         // Don't encode password if already encoded or if it's from OAuth2
         if (user.getPassword() != null && !user.getPassword().startsWith("$2a$")) {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
         }
+        
+        // Ensure name and fullName are synchronized
+        if (user.getName() == null && user.getFullName() != null) {
+            user.setName(user.getFullName());
+        }
+        if (user.getFullName() == null && user.getName() != null) {
+            user.setFullName(user.getName());
+        }
+        
         return userRepository.save(user);
     }
     
@@ -67,6 +77,7 @@ public class UserService implements UserDetailsService {
             .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy user"));
         
         existingUser.setEmail(user.getEmail());
+        existingUser.setName(user.getFullName() != null ? user.getFullName() : user.getName());
         existingUser.setFullName(user.getFullName());
         existingUser.setPhone(user.getPhone());
         

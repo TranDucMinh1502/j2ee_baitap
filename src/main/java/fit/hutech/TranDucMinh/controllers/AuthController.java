@@ -85,13 +85,32 @@ public class AuthController {
                 return "auth/register";
             }
             
+            // Validate input
+            if (username == null || username.trim().isEmpty()) {
+                model.addAttribute("errorMessage", "Tên đăng nhập không được để trống!");
+                return "auth/register";
+            }
+            if (email == null || email.trim().isEmpty()) {
+                model.addAttribute("errorMessage", "Email không được để trống!");
+                return "auth/register";
+            }
+            if (fullName == null || fullName.trim().isEmpty()) {
+                model.addAttribute("errorMessage", "Họ và tên không được để trống!");
+                return "auth/register";
+            }
+            if (password == null || password.length() < 6) {
+                model.addAttribute("errorMessage", "Mật khẩu phải có ít nhất 6 ký tự!");
+                return "auth/register";
+            }
+            
             // Create new user
             User user = new User();
-            user.setUsername(username);
-            user.setEmail(email);
-            user.setFullName(fullName);
-            user.setPhone(phone);
-            user.setPassword(passwordEncoder.encode(password));
+            user.setUsername(username.trim());
+            user.setEmail(email.trim());
+            user.setName(fullName.trim());
+            user.setFullName(fullName.trim());
+            user.setPhone(phone != null ? phone.trim() : null);
+            user.setPassword(password);
             user.setEnabled(true);
             
             // Assign USER role

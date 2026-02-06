@@ -23,6 +23,6 @@ public class HomeController {
         
         // Nếu chưa đăng nhập, hiển thị trang chủ với sản phẩm
         model.addAttribute("books", bookService.getAllBooks());
-        return "index";
+        return "book/index";
     }
 }
