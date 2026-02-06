@@ -1,0 +1,321 @@
+<!doctype html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  lang="vi"
+>
+  <head th:replace="~{book/layout-modern::head(~{::title})}">
+    <title>Danh sách sách - HUTECH Bookstore</title>
+  </head>
+  <body>
+    <!-- Header -->
+    <header th:replace="~{book/layout-modern::header}"></header>
+
+    <!-- Breadcrumb -->
+    <div class="container mt-4">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a th:href="@{/books}" class="text-decoration-none">
+              <i class="bi bi-house-door"></i> Trang chủ
+            </a>
+          </li>
+          <li class="breadcrumb-item active" aria-current="page">
+            Danh sách sách
+          </li>
+        </ol>
+      </nav>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container my-5">
+      <!-- Flash Messages -->
+      <div th:replace="~{components/ui-components::flash-messages}"></div>
+
+      <!-- Page Header -->
+      <div class="row mb-4">
+        <div class="col-lg-8">
+          <h2 class="fw-bold mb-2">
+            <i class="bi bi-book-half hutech-text-primary"></i>
+            Danh sách sách
+          </h2>
+          <p
+            class="hutech-text-muted mb-0"
+            th:if="${books != null and books.content != null}"
+          >
+            Tìm thấy <strong th:text="${books.totalElements}">0</strong> cuốn
+            sách
+          </p>
+        </div>
+        <div class="col-lg-4">
+          <!-- View Toggle -->
+          <div class="d-flex justify-content-end gap-2">
+            <button
+              class="hutech-btn hutech-btn-icon"
+              id="gridViewBtn"
+              onclick="setView('grid')"
+            >
+              <i class="bi bi-grid-3x3-gap"></i>
+            </button>
+            <button
+              class="hutech-btn hutech-btn-icon hutech-btn-light"
+              id="listViewBtn"
+              onclick="setView('list')"
+            >
+              <i class="bi bi-list-ul"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- Sidebar Filters -->
+        <div class="col-lg-3 mb-4">
+          <div class="hutech-card hutech-card-elevated">
+            <div class="hutech-card-header">
+              <h5 class="fw-bold mb-0">
+                <i class="bi bi-funnel"></i>
+                Bộ lọc
+              </h5>
+            </div>
+            <div class="hutech-card-body">
+              <form th:action="@{/books/list}" method="get">
+                <!-- Search -->
+                <div class="hutech-form-group">
+                  <label class="hutech-form-label">
+                    <i class="bi bi-search"></i> Tìm kiếm
+                  </label>
+                  <input
+                    type="text"
+                    name="keyword"
+                    class="hutech-form-control"
+                    placeholder="Tên sách, tác giả..."
+                    th:value="${keyword}"
+                  />
+                </div>
+
+                <!-- Category Filter -->
+                <div
+                  class="hutech-form-group"
+                  th:if="${categories != null and !categories.isEmpty()}"
+                >
+                  <label class="hutech-form-label">
+                    <i class="bi bi-tag"></i> Danh mục
+                  </label>
+                  <select name="categoryId" class="hutech-form-control">
+                    <option value="">Tất cả danh mục</option>
+                    <option
+                      th:each="category : ${categories}"
+                      th:value="${category.id}"
+                      th:text="${category.name}"
+                      th:selected="${categoryId != null and categoryId == category.id}"
+                    >
+                      Category
+                    </option>
+                  </select>
+                </div>
+
+                <!-- Price Range -->
+                <div class="hutech-form-group">
+                  <label class="hutech-form-label">
+                    <i class="bi bi-cash"></i> Khoảng giá
+                  </label>
+                  <div class="row g-2">
+                    <div class="col-6">
+                      <input
+                        type="number"
+                        name="minPrice"
+                        class="hutech-form-control hutech-form-control-sm"
+                        placeholder="Từ"
+                        th:value="${minPrice}"
+                      />
+                    </div>
+                    <div class="col-6">
+                      <input
+                        type="number"
+                        name="maxPrice"
+                        class="hutech-form-control hutech-form-control-sm"
+                        placeholder="Đến"
+                        th:value="${maxPrice}"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Sort -->
+                <div class="hutech-form-group">
+                  <label class="hutech-form-label">
+                    <i class="bi bi-sort-down"></i> Sắp xếp
+                  </label>
+                  <select name="sort" class="hutech-form-control">
+                    <option value="">Mặc định</option>
+                    <option
+                      value="title,asc"
+                      th:selected="${sort == 'title,asc'}"
+                    >
+                      Tên A-Z
+                    </option>
+                    <option
+                      value="title,desc"
+                      th:selected="${sort == 'title,desc'}"
+                    >
+                      Tên Z-A
+                    </option>
+                    <option
+                      value="price,asc"
+                      th:selected="${sort == 'price,asc'}"
+                    >
+                      Giá tăng dần
+                    </option>
+                    <option
+                      value="price,desc"
+                      th:selected="${sort == 'price,desc'}"
+                    >
+                      Giá giảm dần
+                    </option>
+                  </select>
+                </div>
+
+                <!-- Buttons -->
+                <div class="d-flex gap-2">
+                  <button
+                    type="submit"
+                    class="hutech-btn hutech-btn-primary flex-grow-1"
+                  >
+                    <i class="bi bi-search"></i> Lọc
+                  </button>
+                  <a
+                    th:href="@{/books/list}"
+                    class="hutech-btn hutech-btn-light"
+                  >
+                    <i class="bi bi-x-circle"></i>
+                  </a>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Popular Categories -->
+          <div
+            class="hutech-card mt-4"
+            th:if="${categories != null and !categories.isEmpty()}"
+          >
+            <div class="hutech-card-header">
+              <h6 class="fw-bold mb-0">
+                <i class="bi bi-star"></i> Danh mục phổ biến
+              </h6>
+            </div>
+            <div class="hutech-card-body">
+              <div class="d-flex flex-column gap-2">
+                <a
+                  th:each="category : ${categories}"
+                  th:href="@{/books/list(categoryId=${category.id})}"
+                  class="hutech-nav-link"
+                  th:classappend="${categoryId != null and categoryId == category.id ? 'active' : ''}"
+                >
+                  <i class="bi bi-folder2"></i>
+                  <span th:text="${category.name}">Category</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Books List/Grid -->
+        <div class="col-lg-9">
+          <!-- Grid View -->
+          <div id="gridView">
+            <div
+              class="row g-4"
+              th:if="${books != null and books.content != null and !books.content.isEmpty()}"
+            >
+              <div class="col-lg-4 col-md-6" th:each="book : ${books.content}">
+                <div
+                  th:replace="~{components/ui-components::book-card(${book})}"
+                ></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- List View (Hidden by default) -->
+          <div id="listView" style="display: none">
+            <div
+              th:if="${books != null and books.content != null and !books.content.isEmpty()}"
+            >
+              <div th:each="book : ${books.content}">
+                <div
+                  th:replace="~{components/ui-components::book-card-list(${book})}"
+                ></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty State -->
+          <div
+            th:if="${books == null or books.content == null or books.content.isEmpty()}"
+          >
+            <div
+              th:replace="~{components/ui-components::empty-state(
+                        'bi-inbox', 
+                        'Không tìm thấy sách nào', 
+                        'Vui lòng thử lại với từ khóa khác hoặc xóa bộ lọc',
+                        '/books/list',
+                        'Xem tất cả sách'
+                    )}"
+            ></div>
+          </div>
+
+          <!-- Pagination -->
+          <div
+            class="mt-5"
+            th:if="${books != null and books.content != null and !books.content.isEmpty()}"
+          >
+            <div
+              th:replace="~{components/ui-components::pagination-enhanced(${books})}"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer th:replace="~{book/layout-modern::footer}"></footer>
+
+    <!-- Scripts -->
+    <div th:replace="~{book/layout-modern::scripts}"></div>
+
+    <script>
+      // View Toggle Functionality
+      function setView(view) {
+        const gridView = document.getElementById("gridView");
+        const listView = document.getElementById("listView");
+        const gridBtn = document.getElementById("gridViewBtn");
+        const listBtn = document.getElementById("listViewBtn");
+
+        if (view === "grid") {
+          gridView.style.display = "block";
+          listView.style.display = "none";
+          gridBtn.classList.remove("hutech-btn-light");
+          gridBtn.classList.add("hutech-btn-primary");
+          listBtn.classList.remove("hutech-btn-primary");
+          listBtn.classList.add("hutech-btn-light");
+          localStorage.setItem("bookView", "grid");
+        } else {
+          gridView.style.display = "none";
+          listView.style.display = "block";
+          listBtn.classList.remove("hutech-btn-light");
+          listBtn.classList.add("hutech-btn-primary");
+          gridBtn.classList.remove("hutech-btn-primary");
+          gridBtn.classList.add("hutech-btn-light");
+          localStorage.setItem("bookView", "list");
+        }
+      }
+
+      // Load saved view preference
+      document.addEventListener("DOMContentLoaded", function () {
+        const savedView = localStorage.getItem("bookView") || "grid";
+        setView(savedView);
+      });
+    </script>
+  </body>
+</html>

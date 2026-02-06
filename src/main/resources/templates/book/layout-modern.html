@@ -1,0 +1,378 @@
+<!doctype html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  lang="vi"
+>
+  <head th:fragment="head(title)">
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:replace="${title}">HUTECH Bookstore</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+
+    <!-- Bootstrap Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+
+    <!-- HUTECH Design System -->
+    <link rel="stylesheet" th:href="@{/css/hutech-design-system.css}" />
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+  </head>
+
+  <body>
+    <!-- ========== HEADER / NAVBAR ========== -->
+    <header th:fragment="header" class="hutech-navbar">
+      <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+        <div class="container-fluid px-4">
+          <!-- Brand -->
+          <a class="hutech-navbar-brand" th:href="@{/books}">
+            <i class="bi bi-book-half"></i>
+            <span>HUTECH Bookstore</span>
+          </a>
+
+          <!-- Mobile Toggle -->
+          <button
+            class="navbar-toggler border-0"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarMain"
+            aria-controls="navbarMain"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <!-- Main Navigation -->
+          <div class="collapse navbar-collapse" id="navbarMain">
+            <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a
+                  class="hutech-nav-link"
+                  th:href="@{/books}"
+                  th:classappend="${#request.requestURI == '/books' ? 'active' : ''}"
+                >
+                  <i class="bi bi-house-door"></i>
+                  <span>Trang chủ</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  class="hutech-nav-link"
+                  th:href="@{/books/list}"
+                  th:classappend="${#request.requestURI.contains('/books/list') ? 'active' : ''}"
+                >
+                  <i class="bi bi-grid"></i>
+                  <span>Sản phẩm</span>
+                </a>
+              </li>
+              <li class="nav-item" sec:authorize="isAuthenticated()">
+                <a
+                  class="hutech-nav-link"
+                  th:href="@{/books/my-orders}"
+                  th:classappend="${#request.requestURI.contains('/my-orders') ? 'active' : ''}"
+                >
+                  <i class="bi bi-bag-check"></i>
+                  <span>Đơn hàng</span>
+                </a>
+              </li>
+            </ul>
+
+            <!-- Search Form -->
+            <form class="d-flex me-3" th:action="@{/books/list}" method="get">
+              <div class="hutech-input-group" style="max-width: 300px">
+                <input
+                  class="hutech-form-control"
+                  type="search"
+                  placeholder="Tìm kiếm sách..."
+                  name="keyword"
+                  th:value="${keyword}"
+                />
+                <button class="hutech-btn hutech-btn-primary" type="submit">
+                  <i class="bi bi-search"></i>
+                </button>
+              </div>
+            </form>
+
+            <!-- User Actions -->
+            <ul class="navbar-nav ms-auto align-items-lg-center gap-2">
+              <!-- Cart -->
+              <li class="nav-item" sec:authorize="isAuthenticated()">
+                <a
+                  class="hutech-btn hutech-btn-light position-relative"
+                  th:href="@{/cart}"
+                >
+                  <i class="bi bi-cart3"></i>
+                  <span
+                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                    th:if="${cartItemCount != null and cartItemCount > 0}"
+                    th:text="${cartItemCount}"
+                  >
+                    0
+                  </span>
+                </a>
+              </li>
+
+              <!-- User Dropdown -->
+              <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
+                <a
+                  class="hutech-btn hutech-btn-light dropdown-toggle"
+                  href="#"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  <i class="bi bi-person-circle"></i>
+                  <span sec:authentication="name">User</span>
+                </a>
+                <ul
+                  class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2"
+                  style="min-width: 220px"
+                >
+                  <li>
+                    <a class="dropdown-item py-2" th:href="@{/books/profile}">
+                      <i class="bi bi-person me-2"></i>Thông tin cá nhân
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item py-2" th:href="@{/books/my-orders}">
+                      <i class="bi bi-bag me-2"></i>Đơn hàng của tôi
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item py-2" th:href="@{/books/chat}">
+                      <i class="bi bi-chat-dots me-2"></i>Chat hỗ trợ
+                    </a>
+                  </li>
+                  <li><hr class="dropdown-divider" /></li>
+                  <li sec:authorize="hasRole('ROLE_ADMIN')">
+                    <a
+                      class="dropdown-item py-2 text-primary"
+                      th:href="@{/admin/dashboard}"
+                    >
+                      <i class="bi bi-speedometer2 me-2"></i>Vào Admin
+                    </a>
+                  </li>
+                  <li sec:authorize="hasRole('ROLE_ADMIN')">
+                    <hr class="dropdown-divider" />
+                  </li>
+                  <li>
+                    <form th:action="@{/logout}" method="post">
+                      <button
+                        type="submit"
+                        class="dropdown-item py-2 text-danger"
+                      >
+                        <i class="bi bi-box-arrow-right me-2"></i>Đăng xuất
+                      </button>
+                    </form>
+                  </li>
+                </ul>
+              </li>
+
+              <!-- Guest Actions -->
+              <li class="nav-item" sec:authorize="isAnonymous()">
+                <a
+                  class="hutech-btn hutech-btn-outline-primary"
+                  th:href="@{/login}"
+                >
+                  <i class="bi bi-box-arrow-in-right"></i>
+                  <span>Đăng nhập</span>
+                </a>
+              </li>
+              <li class="nav-item" sec:authorize="isAnonymous()">
+                <a class="hutech-btn hutech-btn-primary" th:href="@{/register}">
+                  <i class="bi bi-person-plus"></i>
+                  <span>Đăng ký</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <!-- ========== FOOTER ========== -->
+    <footer th:fragment="footer" class="bg-white border-top mt-5">
+      <div class="container py-5">
+        <div class="row g-4">
+          <!-- Brand Section -->
+          <div class="col-lg-4 col-md-6">
+            <div class="hutech-navbar-brand mb-3">
+              <i class="bi bi-book-half"></i>
+              <span>HUTECH Bookstore</span>
+            </div>
+            <p class="hutech-text-muted mb-3">
+              Hệ thống quản lý cửa hàng sách trực tuyến dành cho sinh viên và
+              giảng viên Đại học Công nghệ TP.HCM (HUTECH).
+            </p>
+            <div class="d-flex gap-2">
+              <a href="#" class="hutech-btn hutech-btn-icon hutech-btn-light">
+                <i class="bi bi-facebook"></i>
+              </a>
+              <a href="#" class="hutech-btn hutech-btn-icon hutech-btn-light">
+                <i class="bi bi-twitter"></i>
+              </a>
+              <a href="#" class="hutech-btn hutech-btn-icon hutech-btn-light">
+                <i class="bi bi-instagram"></i>
+              </a>
+              <a href="#" class="hutech-btn hutech-btn-icon hutech-btn-light">
+                <i class="bi bi-youtube"></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- Quick Links -->
+          <div class="col-lg-2 col-md-6">
+            <h6 class="fw-bold mb-3">Liên kết</h6>
+            <ul class="list-unstyled">
+              <li class="mb-2">
+                <a href="#" class="text-decoration-none hutech-text-muted"
+                  >Về chúng tôi</a
+                >
+              </li>
+              <li class="mb-2">
+                <a href="#" class="text-decoration-none hutech-text-muted"
+                  >Sản phẩm</a
+                >
+              </li>
+              <li class="mb-2">
+                <a href="#" class="text-decoration-none hutech-text-muted"
+                  >Tin tức</a
+                >
+              </li>
+              <li class="mb-2">
+                <a href="#" class="text-decoration-none hutech-text-muted"
+                  >Liên hệ</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <!-- Support -->
+          <div class="col-lg-3 col-md-6">
+            <h6 class="fw-bold mb-3">Hỗ trợ</h6>
+            <ul class="list-unstyled">
+              <li class="mb-2">
+                <a href="#" class="text-decoration-none hutech-text-muted"
+                  >Hướng dẫn đặt hàng</a
+                >
+              </li>
+              <li class="mb-2">
+                <a href="#" class="text-decoration-none hutech-text-muted"
+                  >Chính sách vận chuyển</a
+                >
+              </li>
+              <li class="mb-2">
+                <a href="#" class="text-decoration-none hutech-text-muted"
+                  >Chính sách đổi trả</a
+                >
+              </li>
+              <li class="mb-2">
+                <a href="#" class="text-decoration-none hutech-text-muted"
+                  >Câu hỏi thường gặp</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <!-- Contact -->
+          <div class="col-lg-3 col-md-6">
+            <h6 class="fw-bold mb-3">Liên hệ</h6>
+            <ul class="list-unstyled hutech-text-muted">
+              <li class="mb-2">
+                <i class="bi bi-geo-alt me-2 hutech-text-primary"></i>
+                475A Điện Biên Phủ, P.25, Q.Bình Thạnh, TP.HCM
+              </li>
+              <li class="mb-2">
+                <i class="bi bi-telephone me-2 hutech-text-primary"></i>
+                (028) 5445 7777
+              </li>
+              <li class="mb-2">
+                <i class="bi bi-envelope me-2 hutech-text-primary"></i>
+                info@hutech.edu.vn
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Copyright -->
+        <hr class="my-4" />
+        <div class="row">
+          <div class="col-md-6 text-center text-md-start">
+            <p class="hutech-text-muted mb-0">
+              © 2024 HUTECH Bookstore. All rights reserved.
+            </p>
+          </div>
+          <div class="col-md-6 text-center text-md-end">
+            <p class="hutech-text-muted mb-0">
+              Phát triển bởi
+              <strong class="hutech-text-primary">Trần Đức Minh</strong>
+            </p>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- ========== SCRIPTS ========== -->
+    <th:block th:fragment="scripts">
+      <!-- jQuery -->
+      <script th:src="@{/js/jquery-3.7.0.min.js}"></script>
+
+      <!-- Bootstrap Bundle -->
+      <script th:src="@{/js/bootstrap.min.js}"></script>
+
+      <!-- Custom Scripts -->
+      <script>
+        // Auto-hide alerts after 5 seconds
+        document.addEventListener("DOMContentLoaded", function () {
+          const alerts = document.querySelectorAll(
+            ".alert:not(.alert-permanent)",
+          );
+          alerts.forEach(function (alert) {
+            setTimeout(function () {
+              const bsAlert = new bootstrap.Alert(alert);
+              bsAlert.close();
+            }, 5000);
+          });
+        });
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+          anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute("href"));
+            if (target) {
+              target.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+              });
+            }
+          });
+        });
+
+        // Add active class to current nav link
+        const currentPath = window.location.pathname;
+        document.querySelectorAll(".hutech-nav-link").forEach((link) => {
+          if (link.getAttribute("href") === currentPath) {
+            link.classList.add("active");
+          }
+        });
+      </script>
+    </th:block>
+  </body>
+</html>

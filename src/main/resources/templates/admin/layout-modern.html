@@ -1,0 +1,553 @@
+<!doctype html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  lang="vi"
+>
+  <!-- ========== HEAD ========== -->
+  <head th:fragment="admin-head(title)">
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:replace="${title}">Admin - HUTECH Bookstore</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+
+    <!-- Bootstrap Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+
+    <!-- HUTECH Design System -->
+    <link rel="stylesheet" th:href="@{/css/hutech-design-system.css}" />
+
+    <!-- Chart.js (for dashboard charts) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  </head>
+
+  <body>
+    <!-- ========== SIDEBAR ========== -->
+    <nav
+      th:fragment="sidebar(activePage)"
+      class="hutech-sidebar"
+      id="adminSidebar"
+    >
+      <!-- Brand -->
+      <div class="hutech-sidebar-brand">
+        <i class="bi bi-shield-check display-4 text-white mb-2"></i>
+        <h3 class="mb-0">Admin Panel</h3>
+        <p class="text-white-50 small mb-0">HUTECH Bookstore</p>
+      </div>
+
+      <!-- Navigation -->
+      <div class="hutech-sidebar-nav">
+        <a
+          th:href="@{/admin/dashboard}"
+          class="hutech-sidebar-link"
+          th:classappend="${activePage == 'dashboard' ? 'active' : ''}"
+        >
+          <i class="bi bi-speedometer2"></i>
+          <span>Dashboard</span>
+        </a>
+
+        <a
+          th:href="@{/admin/products}"
+          class="hutech-sidebar-link"
+          th:classappend="${activePage == 'products' ? 'active' : ''}"
+        >
+          <i class="bi bi-book"></i>
+          <span>Quản lý sách</span>
+        </a>
+
+        <a
+          th:href="@{/admin/categories}"
+          class="hutech-sidebar-link"
+          th:classappend="${activePage == 'categories' ? 'active' : ''}"
+        >
+          <i class="bi bi-tags"></i>
+          <span>Danh mục</span>
+        </a>
+
+        <a
+          th:href="@{/admin/orders}"
+          class="hutech-sidebar-link"
+          th:classappend="${activePage == 'orders' ? 'active' : ''}"
+        >
+          <i class="bi bi-cart-check"></i>
+          <span>Đơn hàng</span>
+        </a>
+
+        <a
+          th:href="@{/admin/users}"
+          class="hutech-sidebar-link"
+          th:classappend="${activePage == 'users' ? 'active' : ''}"
+        >
+          <i class="bi bi-people"></i>
+          <span>Người dùng</span>
+        </a>
+
+        <a
+          th:href="@{/admin/vouchers}"
+          class="hutech-sidebar-link"
+          th:classappend="${activePage == 'vouchers' ? 'active' : ''}"
+        >
+          <i class="bi bi-ticket-perforated"></i>
+          <span>Voucher</span>
+        </a>
+
+        <a
+          th:href="@{/admin/chat}"
+          class="hutech-sidebar-link"
+          th:classappend="${activePage == 'chat' ? 'active' : ''}"
+        >
+          <i class="bi bi-chat-dots"></i>
+          <span>Chat</span>
+        </a>
+
+        <a
+          th:href="@{/admin/reports}"
+          class="hutech-sidebar-link"
+          th:classappend="${activePage == 'reports' ? 'active' : ''}"
+        >
+          <i class="bi bi-bar-chart"></i>
+          <span>Báo cáo</span>
+        </a>
+
+        <a
+          th:href="@{/admin/settings}"
+          class="hutech-sidebar-link"
+          th:classappend="${activePage == 'settings' ? 'active' : ''}"
+        >
+          <i class="bi bi-gear"></i>
+          <span>Cài đặt</span>
+        </a>
+
+        <hr class="border-white opacity-25 my-3" />
+
+        <a th:href="@{/books}" class="hutech-sidebar-link" target="_blank">
+          <i class="bi bi-box-arrow-up-right"></i>
+          <span>Xem trang chủ</span>
+        </a>
+
+        <form th:action="@{/logout}" method="post">
+          <button
+            type="submit"
+            class="hutech-sidebar-link border-0 bg-transparent w-100 text-start"
+          >
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Đăng xuất</span>
+          </button>
+        </form>
+      </div>
+    </nav>
+
+    <!-- ========== TOP BAR ========== -->
+    <div th:fragment="topbar(pageTitle, pageSubtitle)" class="hutech-topbar">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h4 class="hutech-topbar-title mb-1" th:text="${pageTitle}">
+            Page Title
+          </h4>
+          <p class="hutech-topbar-subtitle mb-0" th:text="${pageSubtitle}">
+            Page subtitle
+          </p>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+          <!-- Notifications -->
+          <div class="dropdown">
+            <button
+              class="hutech-btn hutech-btn-light position-relative"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i class="bi bi-bell"></i>
+              <span
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+              >
+                3
+              </span>
+            </button>
+            <ul
+              class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2"
+              style="min-width: 320px; max-height: 400px; overflow-y: auto"
+            >
+              <li class="px-3 py-2 bg-light border-bottom">
+                <h6 class="mb-0 fw-bold">Thông báo</h6>
+              </li>
+              <li>
+                <a class="dropdown-item py-3 border-bottom" href="#">
+                  <div class="d-flex">
+                    <div class="flex-shrink-0">
+                      <i class="bi bi-cart-check text-success fs-4"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                      <p class="mb-1 small">Đơn hàng mới #1234</p>
+                      <p class="mb-0 text-muted small">5 phút trước</p>
+                    </div>
+                  </div>
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item py-3 border-bottom" href="#">
+                  <div class="d-flex">
+                    <div class="flex-shrink-0">
+                      <i class="bi bi-person-plus text-primary fs-4"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                      <p class="mb-1 small">Người dùng mới đăng ký</p>
+                      <p class="mb-0 text-muted small">15 phút trước</p>
+                    </div>
+                  </div>
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item py-3" href="#">
+                  <div class="d-flex">
+                    <div class="flex-shrink-0">
+                      <i class="bi bi-chat-dots text-info fs-4"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                      <p class="mb-1 small">Tin nhắn mới từ khách hàng</p>
+                      <p class="mb-0 text-muted small">1 giờ trước</p>
+                    </div>
+                  </div>
+                </a>
+              </li>
+              <li class="px-3 py-2 bg-light text-center">
+                <a href="#" class="text-decoration-none small fw-medium"
+                  >Xem tất cả</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <!-- User Menu -->
+          <div class="dropdown">
+            <button
+              class="hutech-btn hutech-btn-light d-flex align-items-center gap-2"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i class="bi bi-person-circle fs-5"></i>
+              <span sec:authentication="name">Admin</span>
+              <i class="bi bi-chevron-down"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2">
+              <li>
+                <a class="dropdown-item py-2" th:href="@{/books/profile}">
+                  <i class="bi bi-person me-2"></i>Hồ sơ
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item py-2" th:href="@{/admin/settings}">
+                  <i class="bi bi-gear me-2"></i>Cài đặt
+                </a>
+              </li>
+              <li><hr class="dropdown-divider" /></li>
+              <li>
+                <form th:action="@{/logout}" method="post">
+                  <button type="submit" class="dropdown-item py-2 text-danger">
+                    <i class="bi bi-box-arrow-right me-2"></i>Đăng xuất
+                  </button>
+                </form>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Mobile Menu Toggle -->
+          <button
+            class="hutech-btn hutech-btn-light d-lg-none"
+            type="button"
+            onclick="toggleSidebar()"
+          >
+            <i class="bi bi-list fs-4"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== STAT CARDS ========== -->
+    <div th:fragment="stat-card(icon, label, value, change, changeType, color)">
+      <div class="hutech-stat-card">
+        <div class="d-flex justify-content-between align-items-start">
+          <div class="flex-grow-1">
+            <div class="hutech-stat-label" th:text="${label}">Label</div>
+            <div class="hutech-stat-value" th:text="${value}">0</div>
+            <div
+              class="hutech-stat-change"
+              th:classappend="${changeType == 'positive' ? 'positive' : 'negative'}"
+            >
+              <i
+                th:class="${changeType == 'positive' ? 'bi bi-arrow-up' : 'bi bi-arrow-down'}"
+              ></i>
+              <span th:text="${change}">0%</span>
+              <span class="text-muted">so với tháng trước</span>
+            </div>
+          </div>
+          <div class="hutech-stat-icon" th:style="'color: ' + ${color}">
+            <i th:class="'bi ' + ${icon}"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== TABLE ACTIONS ========== -->
+    <div
+      th:fragment="table-actions(searchPlaceholder, addButtonText, addButtonUrl)"
+    >
+      <div
+        class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3"
+      >
+        <!-- Search -->
+        <div class="flex-grow-1" style="max-width: 400px">
+          <form method="get">
+            <div class="hutech-input-group">
+              <span class="hutech-input-group-text">
+                <i class="bi bi-search"></i>
+              </span>
+              <input
+                type="search"
+                name="keyword"
+                class="hutech-form-control"
+                th:placeholder="${searchPlaceholder}"
+                th:value="${keyword}"
+              />
+            </div>
+          </form>
+        </div>
+
+        <!-- Actions -->
+        <div class="d-flex gap-2">
+          <button class="hutech-btn hutech-btn-light" onclick="window.print()">
+            <i class="bi bi-printer"></i>
+            <span>In</span>
+          </button>
+          <a th:href="${addButtonUrl}" class="hutech-btn hutech-btn-primary">
+            <i class="bi bi-plus-circle"></i>
+            <span th:text="${addButtonText}">Thêm mới</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== PAGINATION ========== -->
+    <div th:fragment="pagination(page)">
+      <nav aria-label="Page navigation" th:if="${page.totalPages > 1}">
+        <ul class="hutech-pagination">
+          <!-- Previous -->
+          <li>
+            <a
+              class="hutech-pagination-link"
+              th:classappend="${page.first ? 'disabled' : ''}"
+              th:href="@{''(page=${page.number - 1}, keyword=${keyword})}"
+            >
+              <i class="bi bi-chevron-left"></i>
+            </a>
+          </li>
+
+          <!-- Page Numbers -->
+          <li th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}">
+            <a
+              class="hutech-pagination-link"
+              th:classappend="${i == page.number ? 'active' : ''}"
+              th:href="@{''(page=${i}, keyword=${keyword})}"
+              th:text="${i + 1}"
+              >1</a
+            >
+          </li>
+
+          <!-- Next -->
+          <li>
+            <a
+              class="hutech-pagination-link"
+              th:classappend="${page.last ? 'disabled' : ''}"
+              th:href="@{''(page=${page.number + 1}, keyword=${keyword})}"
+            >
+              <i class="bi bi-chevron-right"></i>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- ========== CONFIRM DELETE MODAL ========== -->
+    <div th:fragment="delete-modal(modalId, title, message, deleteUrl)">
+      <div
+        class="modal fade"
+        th:id="${modalId}"
+        tabindex="-1"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="hutech-modal-content">
+            <div class="hutech-modal-header">
+              <h5 class="hutech-modal-title">
+                <i class="bi bi-exclamation-triangle text-danger me-2"></i>
+                <span th:text="${title}">Xác nhận xóa</span>
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="hutech-modal-body">
+              <p th:text="${message}">Bạn có chắc chắn muốn xóa?</p>
+            </div>
+            <div class="hutech-modal-footer">
+              <button
+                type="button"
+                class="hutech-btn hutech-btn-light"
+                data-bs-dismiss="modal"
+              >
+                Hủy
+              </button>
+              <form th:action="${deleteUrl}" method="post" class="d-inline">
+                <input type="hidden" name="_method" value="delete" />
+                <button type="submit" class="hutech-btn hutech-btn-danger">
+                  <i class="bi bi-trash"></i>
+                  Xóa
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== ALERT MESSAGES ========== -->
+    <div th:fragment="alerts">
+      <div
+        th:if="${successMessage}"
+        class="hutech-alert hutech-alert-success hutech-animate-slide-down"
+        role="alert"
+      >
+        <div class="hutech-alert-icon">
+          <i class="bi bi-check-circle-fill"></i>
+        </div>
+        <div class="hutech-alert-content">
+          <div class="hutech-alert-title">Thành công!</div>
+          <div th:text="${successMessage}"></div>
+        </div>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"
+        ></button>
+      </div>
+
+      <div
+        th:if="${errorMessage}"
+        class="hutech-alert hutech-alert-danger hutech-animate-slide-down"
+        role="alert"
+      >
+        <div class="hutech-alert-icon">
+          <i class="bi bi-exclamation-circle-fill"></i>
+        </div>
+        <div class="hutech-alert-content">
+          <div class="hutech-alert-title">Lỗi!</div>
+          <div th:text="${errorMessage}"></div>
+        </div>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"
+        ></button>
+      </div>
+
+      <div
+        th:if="${warningMessage}"
+        class="hutech-alert hutech-alert-warning hutech-animate-slide-down"
+        role="alert"
+      >
+        <div class="hutech-alert-icon">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+        </div>
+        <div class="hutech-alert-content">
+          <div class="hutech-alert-title">Cảnh báo!</div>
+          <div th:text="${warningMessage}"></div>
+        </div>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"
+        ></button>
+      </div>
+
+      <div
+        th:if="${infoMessage}"
+        class="hutech-alert hutech-alert-info hutech-animate-slide-down"
+        role="alert"
+      >
+        <div class="hutech-alert-icon">
+          <i class="bi bi-info-circle-fill"></i>
+        </div>
+        <div class="hutech-alert-content">
+          <div class="hutech-alert-title">Thông tin</div>
+          <div th:text="${infoMessage}"></div>
+        </div>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"
+        ></button>
+      </div>
+    </div>
+
+    <!-- ========== SCRIPTS ========== -->
+    <th:block th:fragment="admin-scripts">
+      <!-- jQuery -->
+      <script th:src="@{/js/jquery-3.7.0.min.js}"></script>
+
+      <!-- Bootstrap Bundle -->
+      <script th:src="@{/js/bootstrap.min.js}"></script>
+
+      <!-- Admin Scripts -->
+      <script>
+        // Toggle sidebar on mobile
+        function toggleSidebar() {
+          const sidebar = document.getElementById("adminSidebar");
+          sidebar.classList.toggle("show");
+        }
+
+        // Auto-hide alerts
+        document.addEventListener("DOMContentLoaded", function () {
+          const alerts = document.querySelectorAll(".hutech-alert");
+          alerts.forEach(function (alert) {
+            setTimeout(function () {
+              const bsAlert = new bootstrap.Alert(alert);
+              bsAlert.close();
+            }, 5000);
+          });
+        });
+
+        // Confirm before delete
+        function confirmDelete(message) {
+          return confirm(message || "Bạn có chắc chắn muốn xóa?");
+        }
+
+        // Table row hover effect
+        document.querySelectorAll(".hutech-table tbody tr").forEach((row) => {
+          row.style.cursor = "pointer";
+        });
+      </script>
+    </th:block>
+  </body>
+</html>
